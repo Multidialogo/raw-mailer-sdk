@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        bootstrap="vendor/autoload.php"
+        colors="true"
+        verbose="true"
+>
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <ini name="display_errors" value="1" />
+        <ini name="memory_limit" value="-1" />
+    </php>
+
+    <listeners>
+        <listener class="PHPUnit\Listener\TestListener" />
+    </listeners>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

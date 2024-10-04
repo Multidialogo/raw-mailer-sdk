@@ -1,0 +1,17 @@
+{
+  "name": "PHP Development Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",  // This should match the service name in your docker-compose.yml
+  "workspaceFolder": "/app", // This is where your code will be available inside the container
+  "settings": {
+    "php.validate.executablePath": "/usr/local/bin/php",
+    "phpunit.phpunitPath": "/vendor/bin/phpunit"  // Adjust based on your PHPUnit configuration
+  },
+  "extensions": [
+    "bmewburn.vscode-intelephense-client",  // PHP Intelephense extension for IntelliSense
+    "felixfbecker.php-intellisense",        // PHP IntelliSense
+    "xdebug.php-debug"                       // Xdebug support
+  ],
+  "postCreateCommand": "composer install", // Command to run after the container is created
+  "remoteUser": "vscode"                    // Change this if your container runs as a different user
+}

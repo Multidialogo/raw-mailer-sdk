@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: docker
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app
+    environment:
+      - COMPOSER_ALLOW_SUPERUSER=1
