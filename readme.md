@@ -28,7 +28,7 @@ Ensure you have the required dependencies installed, including the AWS SDK for P
 To get started, include the necessary namespaces and create an instance of the `Facade` class:
 
 ```php
-use multidialogo\sdk\MailUtils\RawMailer\Facade;
+use multidialogo\RawMailer\Facade;
 
 $facade = new Facade(
     'SES', // or 'STD' for standard SMTP, 'FAKE' for testing
