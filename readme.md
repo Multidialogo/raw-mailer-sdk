@@ -16,7 +16,7 @@ Welcome to the **Multidialogo Raw Mailer SDK**! This library provides a flexible
 To install the library, clone the repository and run:
 
 ```bash
-composer install
+composer install multidialogo/raw-mailer-sdk
 ```
 
 Ensure you have the required dependencies installed, including the AWS SDK for PHP if you plan to use the SES driver.
