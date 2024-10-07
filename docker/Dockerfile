@@ -13,8 +13,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set the working directory
 WORKDIR /workspace
 
+# Configure PHP extensions if needed
+RUN docker-php-ext-configure pcntl --enable-pcntl
+
 # Install PHP extensions if needed
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql pcntl
+
 
 # Install xdebug
 RUN pecl install xdebug \

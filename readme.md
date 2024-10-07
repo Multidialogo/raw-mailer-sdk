@@ -120,6 +120,48 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 4. Push to the branch (`git push origin feature/MyFeature`).
 5. Open a pull request.
 
+## Development Environment
+This repository includes a devcontainer configuration to streamline the development environment setup. You can use either PhpStorm or Visual Studio Code (VSCode) to take advantage of the development container.
+
+### Using the DevContainer with VSCode
+Install Docker: Ensure that Docker is installed on your machine. Download Docker
+
+Install Visual Studio Code: If you don't have VSCode installed, you can download it from here.
+
+Install the Dev Containers extension: In VSCode, go to the Extensions view (⇧⌘X or Ctrl+Shift+X), search for Dev Containers, and install the extension by Microsoft.
+
+Clone the Repository:
+
+```bash
+git clone https://github.com/Multidialogo/raw-mailer-sdk.git
+```
+
+Open the Repository in VSCode: Open the project folder in VSCode.
+
+Reopen in Container: Once the repository is opened in VSCode, a pop-up will appear asking to "Reopen in Container". If not, you can manually reopen by clicking on the green icon in the bottom-left corner and selecting "Reopen in Container".
+
+Start Development: The container will automatically install the necessary PHP dependencies and set up the environment.
+
+### Using the DevContainer with PhpStorm
+Install Docker: Ensure that Docker is installed on your machine. Download Docker
+
+Install PhpStorm: You can download PhpStorm from here.
+
+Clone the Repository:
+
+```bash
+git clone https://github.com/Multidialogo/raw-mailer-sdk.git
+```
+
+Open the Project in PhpStorm: Open the repository folder in PhpStorm.
+
+Configure Dev Container:
+
+Open Settings in PhpStorm.
+Go to Build, Execution, Deployment > Docker and ensure Docker is properly configured.
+Go to File > Settings > PHP > CLI Interpreter, click Add..., and choose From Docker, Vagrant, VM, WSL, or Remote. Then select the appropriate container configuration.
+Start Development: PhpStorm will utilize the devcontainer and set up the environment, allowing you to work on the project seamlessly within the Dockerized PHP environment.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
