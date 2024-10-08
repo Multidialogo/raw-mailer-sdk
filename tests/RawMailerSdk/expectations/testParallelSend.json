@@ -2,6 +2,7 @@
   {
     "attempt": 0,
     "code": 500,
+    "completedAt": "{{date}}",
     "message": "5.0.0 Internal server error: foobar",
     "messageUuid": "4f41efd7-38ce-4d30-8a32-155a6ec8001b",
     "rawResponse": "500 5.0.0 Internal server error: foobar"
@@ -9,6 +10,7 @@
   {
     "attempt": 0,
     "code": 250,
+    "completedAt": "{{date}}",
     "message": "OK: Message queued for delivery",
     "messageUuid": "70058d57-e4cd-491e-9300-f8b89c3cd05f",
     "rawResponse": "250 OK: Message queued for delivery"
@@ -16,6 +18,7 @@
   {
     "attempt": 0,
     "code": 421,
+    "completedAt": "{{date}}",
     "message": "4.3.2 Service unavailable, try again later.",
     "messageUuid": "8a26886e-37ce-4569-9541-bbeb67a57c66",
     "rawResponse": "421 4.3.2 Service unavailable, try again later."
@@ -23,6 +26,7 @@
   {
     "attempt": 1,
     "code": 421,
+    "completedAt": "{{date}}",
     "message": "4.3.2 Service unavailable, try again later.",
     "messageUuid": "8a26886e-37ce-4569-9541-bbeb67a57c66",
     "rawResponse": "421 4.3.2 Service unavailable, try again later."
@@ -30,6 +34,7 @@
   {
     "attempt": 2,
     "code": 421,
+    "completedAt": "{{date}}",
     "message": "4.3.2 Service unavailable, try again later.",
     "messageUuid": "8a26886e-37ce-4569-9541-bbeb67a57c66",
     "rawResponse": "421 4.3.2 Service unavailable, try again later."

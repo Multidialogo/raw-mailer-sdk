@@ -31,7 +31,7 @@ class FacadeTest extends TestCase
                 ),
                 new Message(
                     '70058d57-e4cd-491e-9300-f8b89c3cd05f',
-                    'test@recipient.multidialogo.it',
+                    'test@recipient2.multidialogo.it',
                     'Test subject',
                     ['X-foobar: fo bar baz',],
                     'Plain text content',
@@ -42,7 +42,7 @@ class FacadeTest extends TestCase
                 ),
                 new Message(
                     '8a26886e-37ce-4569-9541-bbeb67a57c66',
-                    'test@recipient.multidialogo.it',
+                    'test@recipient3.multidialogo.it',
                     'Test subject',
                     ['X-test-fail-busy: busy',],
                     'Plain text content',
@@ -54,7 +54,9 @@ class FacadeTest extends TestCase
             ]
         );
 
-
-        static::assertJsonStringEqualsJsonFile(__DIR__ . '/expectations/testParallelSend.json', json_encode($responses));
+        static::assertJsonStringEqualsJsonFile(
+            __DIR__ . '/expectations/testParallelSend.json',
+            preg_replace('/("completedAt":\s*")[^"]*(")/', '$1' . '{{date}}' . '$2', json_encode($responses))
+        );
     }
 }
