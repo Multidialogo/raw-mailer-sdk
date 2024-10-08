@@ -4,8 +4,9 @@ namespace multidialogo\RawMailerSdk\Model;
 
 
 use InvalidArgumentException;
+use JsonSerializable;
 
-class SmtpServerResponse
+class SmtpServerResponse implements JsonSerializable
 {
     private int $code;
 
@@ -75,19 +76,17 @@ class SmtpServerResponse
         return in_array($this->code, [421, 450, 451, 452,]);
     }
 
-    /**
-     * Get a string representation of the SMTP response.
-     *
-     * @return string The formatted SMTP response.
-     */
-    public function __toString(): string
-    {
-        return sprintf("SMTP Response: [%d] %s", $this->code, $this->message);
-    }
-
     public function getRawResponse(): string
     {
         return $this->rawResponse;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'code' => $this->getCode(),
+            'message' => $this->getMessage(),
+            'rawResponse' => $this->getRawResponse()
+        ];
     }
 }
 

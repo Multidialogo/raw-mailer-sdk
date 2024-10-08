@@ -37,6 +37,17 @@ class Facade
 
     private int $parallelJobs;
 
+    /**
+     * @param string $driver
+     * @param array|null $awsConfig
+     * @param array|null $simpleSmtpConfig
+     * @param string $senderEmail
+     * @param string $resultBaseDir
+     * @param string|null $replyToEmail
+     * @param string|null $catchallDomain
+     * @param string $customBoundaryPrefix
+     * @param int $parallelJobs
+     */
     public function __construct(
         string  $driver,
         ?array  $awsConfig,
@@ -51,6 +62,10 @@ class Facade
     {
         if (!filter_var($senderEmail, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException("Invalid sender {$senderEmail}");
+        }
+
+        if (!is_writable($resultBaseDir)) {
+           throw new InvalidArgumentException("{$resultBaseDir} is not writable");
         }
 
         if ($replyToEmail && !filter_var($replyToEmail, FILTER_VALIDATE_EMAIL)) {
@@ -147,22 +162,26 @@ class Facade
                     $pids[] = $pid; // Keep track of child process IDs
                 } else {
                     // Child process
+                    $attempts = 0;
                     do {
-                        $result = SmtpServerResponse::fromResponse($this->send(
-                            $this->senderEmail,
-                            $message->getRecipient(),
-                            $message->getSubject(),
-                            $message->getAdditionalHeaderLines(),
-                            $message->getPlainText(),
-                            $message->getHtmlText(),
-                            $message->getAttachmentPaths()
-                        ));
-                        file_put_contents("{$resultDirectory}/{$message->getUuid()}", $result->getRawResponse());
+                        $result = SmtpServerResponse::fromResponse(
+                            $this->send(
+                                $this->senderEmail,
+                                $message->getRecipient(),
+                                $message->getSubject(),
+                                $message->getAdditionalHeaderLines(),
+                                $message->getPlainText(),
+                                $message->getHtmlText(),
+                                $message->getAttachmentPaths()
+                            )
+                        );
+
+                        file_put_contents("{$resultDirectory}/{$message->getUuid()}.{$attempts}", $result->getRawResponse());
 
                         if ($maxAttempts) {
                             sleep(1);
                         }
-                    } while ($result->isBusy() && --$maxAttempts > 0);
+                    } while ($result->isBusy() && $attempts++ <= $maxAttempts);
 
 
                     // Terminate child process after sending

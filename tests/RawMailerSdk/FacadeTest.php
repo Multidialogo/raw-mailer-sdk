@@ -19,6 +19,17 @@ class FacadeTest extends TestCase
         ))->parallelSend(
             [
                 new Message(
+                    '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+                    'test@recipient.multidialogo.it',
+                    'Test subject',
+                    ['X-test-fail-internal: fail',],
+                    'Plain text content',
+                    '<html lang="en"><body>Html content</body></html>',
+                    [
+                        __DIR__ . '/fixtures/testParallelSend/01.pdf',
+                    ]
+                ),
+                new Message(
                     '70058d57-e4cd-491e-9300-f8b89c3cd05f',
                     'test@recipient.multidialogo.it',
                     'Test subject',
@@ -30,10 +41,10 @@ class FacadeTest extends TestCase
                     ]
                 ),
                 new Message(
-                    '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+                    '8a26886e-37ce-4569-9541-bbeb67a57c66',
                     'test@recipient.multidialogo.it',
                     'Test subject',
-                    ['X-foobar: fo bar baz',],
+                    ['X-test-fail-busy: busy',],
                     'Plain text content',
                     '<html lang="en"><body>Html content</body></html>',
                     [
@@ -43,6 +54,7 @@ class FacadeTest extends TestCase
             ]
         );
 
-        static::assertEquals('SMTP Response: [250] OK: Message queued for delivery', $responses[0]->__toString());
+
+        static::assertJsonStringEqualsJsonFile(__DIR__ . '/expectations/testParallelSend.json', json_encode($responses));
     }
 }
