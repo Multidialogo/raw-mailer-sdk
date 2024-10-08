@@ -8,8 +8,6 @@ class Message
 {
     private string $uuid;
 
-    private string $folder;
-
     private string $recipient;
 
     private string $subject;
@@ -24,7 +22,6 @@ class Message
 
     public function __construct(
         string $uuid,
-        string $folder,
         string $recipient,
         string $subject,
         array  $additionalHeaderLines,
@@ -54,7 +51,6 @@ class Message
         }
 
         $this->uuid = $uuid;
-        $this->folder = $folder;
         $this->recipient = $recipient;
         $this->subject = $subject;
         $this->additionalHeaderLines = $additionalHeaderLines;
@@ -66,11 +62,6 @@ class Message
     public function getUuid(): string
     {
         return $this->uuid;
-    }
-
-    public function getFolder(): string
-    {
-        return $this->folder;
     }
 
     public function getRecipient(): string

@@ -19,7 +19,17 @@ class FacadeTest extends TestCase
             [
                 new Message(
                     '70058d57-e4cd-491e-9300-f8b89c3cd05f',
-                    'test-folder',
+                    'test@recipient.multidialogo.it',
+                    'Test subject',
+                    ['X-foobar: fo bar baz',],
+                    'Plain text content',
+                    '<html lang="en"><body>Html content</body></html>',
+                    [
+                        __DIR__ . '/fixtures/testParallelSend/01.pdf',
+                    ]
+                ),
+                new Message(
+                    '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
                     'test@recipient.multidialogo.it',
                     'Test subject',
                     ['X-foobar: fo bar baz',],
