@@ -14,7 +14,8 @@ class FacadeTest extends TestCase
             Facade::DRIVERS['FAKE'],
             null,
             null,
-            'test@sender.multidialogo.it'
+            'test@sender.multidialogo.it',
+            __DIR__ . '/../../'
         ))->parallelSend(
             [
                 new Message(

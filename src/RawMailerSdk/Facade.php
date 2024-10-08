@@ -27,6 +27,8 @@ class Facade
 
     private string $senderEmail;
 
+    private string $resultBaseDir;
+
     private ?string $replyToEmail;
 
     private ?string $catchallDomain;
@@ -40,13 +42,13 @@ class Facade
         ?array  $awsConfig,
         ?array  $simpleSmtpConfig,
         string  $senderEmail,
+        string  $resultBaseDir,
         ?string $replyToEmail = null,
         ?string $catchallDomain = null,
         string  $customBoundaryPrefix = 'boundary_',
         int     $parallelJobs = 10
     )
     {
-
         if (!filter_var($senderEmail, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException("Invalid sender {$senderEmail}");
         }
@@ -104,6 +106,7 @@ class Facade
         }
 
         $this->senderEmail = $senderEmail;
+        $this->resultBaseDir = $resultBaseDir;
         $this->replyToEmail = $replyToEmail;
 
         $this->catchallDomain = $catchallDomain;
@@ -120,10 +123,10 @@ class Facade
     {
         $batches = array_chunk($messages, $this->parallelJobs);
 
-        $resultDirectory = __DIR__ . '/../../'. uniqid('results/', true);
+        $resultDirectory = "{$this->resultBaseDir}/" . uniqid('results/', true);
         if (!is_dir($resultDirectory)) {
             if (!mkdir($resultDirectory, 0755, true)) {
-                Throw new RuntimeException("Failed to create directory {$resultDirectory}");
+                throw new RuntimeException("Failed to create directory {$resultDirectory}");
             }
         }
 

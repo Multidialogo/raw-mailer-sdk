@@ -9,3 +9,6 @@ composer.lock
 
 # Phpunit
 .phpunit.result.cache
+
+# src
+/results
