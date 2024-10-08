@@ -1,6 +1,6 @@
 <?php
 
-namespace multidialogo\RawMailer;
+namespace multidialogo\RawMailerSdk;
 
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
@@ -16,7 +16,7 @@ class SesClientFacade implements MailerInterface
         $this->sesClient = $sesClient;
     }
 
-    public function sendRawEmail(string $headers, string $body): SmtpServerResponse
+    public function sendRawEmail(string $headers, string $body): string
     {
         try {
             $result = $this->sesClient->sendRawEmail([
@@ -26,30 +26,17 @@ class SesClientFacade implements MailerInterface
             ]);
 
             $messageId = $result['MessageId'];
-            $smtpResponse = sprintf("250 2.0.0 Ok: queued as %s", $messageId);
+
+            return sprintf("250 2.0.0 Ok: queued as %s", $messageId);
 
         } catch (AwsException $e) {
-            switch ($e->getAwsErrorCode()) {
-                case 'MessageRejected':
-                    $smtpResponse = '550 5.1.1 Recipient address rejected: ' . implode(', ', static::extractRecipients($headers));
-
-                    break;
-                case 'ThrottlingException':
-                    $smtpResponse = '421 4.3.2 Service unavailable, try again later.';
-
-                    break;
-                case 'LimitExceeded':
-                    $smtpResponse = '452 4.3.1 Insufficient storage.';
-
-                    break;
-                default:
-                    $smtpResponse = '500 5.0.0 Internal server error: ' . $e->getMessage();
-
-                    break;
-            }
+            return match ($e->getAwsErrorCode()) {
+                'MessageRejected' => '550 5.1.1 Recipient address rejected: ' . implode(', ', static::extractRecipients($headers)),
+                'ThrottlingException' => '421 4.3.2 Service unavailable, try again later.',
+                'LimitExceeded' => '452 4.3.1 Insufficient storage.',
+                default => '500 5.0.0 Internal server error: ' . $e->getMessage(),
+            };
         }
-
-        return new SmtpServerResponse($smtpResponse);
     }
 
     private static function extractRecipients(string $headers) {

@@ -1,7 +1,6 @@
-vendor
 .dockerignore
 Dockerfile
 README.md
 devcontainer.json
-phpunit.xml.dist
 *.log
+.phpunit.result.cache

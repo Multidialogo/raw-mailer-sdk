@@ -1,5 +1,5 @@
 # Use the official PHP image
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -25,6 +25,8 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+RUN composer install --no-interaction --optimize-autoloader
 
 # Expose the port for the PHP server
 EXPOSE 8000

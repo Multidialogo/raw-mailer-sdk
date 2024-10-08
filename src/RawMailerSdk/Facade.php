@@ -1,9 +1,10 @@
 <?php
 
-namespace multidialogo\RawMailer;
+namespace multidialogo\RawMailerSdk;
 
 use Aws\Ses\SesClient;
 use InvalidArgumentException;
+use multidialogo\RawMailerSdk\Test\FakeMailClient;
 use multidialogo\RawMailerSdk\Model\Message;
 use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
 use RuntimeException;
@@ -28,24 +29,21 @@ class Facade
 
     private ?string $replyToEmail;
 
-    private string $envName;
+    private ?string $catchallDomain;
 
     private string $customBoundaryPrefix;
 
     private int $parallelJobs;
-
-    private ?string $catchallDomain;
 
     public function __construct(
         string  $driver,
         ?array  $awsConfig,
         ?array  $simpleSmtpConfig,
         string  $senderEmail,
-        ?string $replyToEmail,
-        string  $envName,
+        ?string $replyToEmail = null,
+        ?string $catchallDomain = null,
         string  $customBoundaryPrefix = 'boundary_',
-        int     $parallelJobs = 10,
-        ?string $catchallDomain = null
+        int     $parallelJobs = 10
     )
     {
 
@@ -108,10 +106,9 @@ class Facade
         $this->senderEmail = $senderEmail;
         $this->replyToEmail = $replyToEmail;
 
-        $this->envName = $envName;
+        $this->catchallDomain = $catchallDomain;
         $this->customBoundaryPrefix = $customBoundaryPrefix;
         $this->parallelJobs = $parallelJobs;
-        $this->catchallDomain = $catchallDomain;
     }
 
     /**
@@ -123,7 +120,12 @@ class Facade
     {
         $batches = array_chunk($messages, $this->parallelJobs);
 
-        $resultDirectory = tempnam('', uniqid('results_', true));
+        $resultDirectory = __DIR__ . '/../../'. uniqid('results/', true);
+        if (!is_dir($resultDirectory)) {
+            if (!mkdir($resultDirectory, 0755, true)) {
+                Throw new RuntimeException("Failed to create directory {$resultDirectory}");
+            }
+        }
 
         $pids = [];
         foreach ($batches as $batch) {
@@ -143,7 +145,7 @@ class Facade
                 } else {
                     // Child process
                     do {
-                        $result = $this->send(
+                        $result = SmtpServerResponse::fromResponse($this->send(
                             $this->senderEmail,
                             $message->getRecipient(),
                             $message->getSubject(),
@@ -151,17 +153,17 @@ class Facade
                             $message->getPlainText(),
                             $message->getHtmlText(),
                             $message->getAttachmentPaths()
-                        );
+                        ));
+                        file_put_contents("{$resultDirectory}/{$message->getUuid()}", $result->getRawResponse());
 
                         if ($maxAttempts) {
                             sleep(1);
                         }
                     } while ($result->isBusy() && --$maxAttempts > 0);
 
-                    file_put_contents("{$resultDirectory}/{$message->getUuid()}.json", json_encode($result->getRawResult()));
 
                     // Terminate child process after sending
-                    exit((int) $result->isError());
+                    exit((int)$result->isError());
                 }
             }
         }
@@ -172,9 +174,9 @@ class Facade
         }
 
         $results = [];
-        $resultFiles = glob("{$resultDirectory}/*.json");
+        $resultFiles = glob("{$resultDirectory}/*");
         foreach ($resultFiles as $resultFile) {
-            $results[] = SmtpServerResponse::fromJson(file_get_contents($resultFile));
+            $results[] = SmtpServerResponse::fromResponse(file_get_contents($resultFile));
         }
 
         return $results;
@@ -188,7 +190,7 @@ class Facade
         string $bodyText,
         string $bodyHtml,
         array  $attachmentPaths
-    ): SmtpServerResponse
+    ): string
     {
         // Create the MIME boundary
         $boundary = uniqid($this->customBoundaryPrefix);
@@ -268,10 +270,6 @@ class Facade
             return $email;
         }
 
-        return str_replace(
-                '@',
-                '_AT_' . strtoupper($this->envName) . '_',
-                $email)
-            . "@{$this->catchallDomain}";
+        return str_replace('@', '_AT_', $email) . "@{$this->catchallDomain}";
     }
 }

@@ -4,6 +4,6 @@ services:
       context: docker
       dockerfile: Dockerfile
     volumes:
-      - ./src:/app
+      - .:/workspace
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1

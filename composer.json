@@ -12,7 +12,7 @@
   },
   "autoload": {
     "psr-4": {
-      "multidialogo\\RawMailerSdk\\": "src/"
+      "multidialogo\\RawMailerSdk\\": "src/RawMailerSdk"
     },
     "exclude-from-classmap": [
       ".devcontainer/",

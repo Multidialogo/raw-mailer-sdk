@@ -7,33 +7,27 @@ use InvalidArgumentException;
 
 class SmtpServerResponse
 {
-    private $code;
-    private $message;
+    private int $code;
 
-    /**
-     * Constructor to initialize the SMTP response.
-     *
-     * @param string $response The raw SMTP response string.
-     */
-    public function __construct(string $response)
+    private string $message;
+
+    private string $rawResponse;
+
+    private function __construct(int $code, string $message, string $rawResponse)
     {
-        $this->parseResponse($response);
+        $this->code = $code;
+        $this->message = $message;
+        $this->rawResponse = $rawResponse;
     }
 
-    /**
-     * Parse the raw SMTP response string.
-     *
-     * @param string $response The raw SMTP response string.
-     */
-    private function parseResponse(string $response): void
+    public static function fromResponse(string $rawResponse): self
     {
         // Split response into code and message
-        if (preg_match('/^(\d{3})\s*(.*)$/', $response, $matches)) {
-            $this->code = (int)$matches[1];
-            $this->message = trim($matches[2]);
-        } else {
-            throw new InvalidArgumentException("Invalid SMTP response format: '$response'");
+        if (preg_match('/^(\d{3})\s*(.*)$/', $rawResponse, $matches)) {
+            return new self((int)$matches[1], trim($matches[2]), $rawResponse);
         }
+
+        throw new InvalidArgumentException("Invalid SMTP response format: '{$rawResponse}'");
     }
 
     /**
@@ -78,7 +72,7 @@ class SmtpServerResponse
 
     public function isBusy(): bool
     {
-        return in_array($this->code, [421,450,451,452,]);
+        return in_array($this->code, [421, 450, 451, 452,]);
     }
 
     /**
@@ -89,6 +83,11 @@ class SmtpServerResponse
     public function __toString(): string
     {
         return sprintf("SMTP Response: [%d] %s", $this->code, $this->message);
+    }
+
+    public function getRawResponse(): string
+    {
+        return $this->rawResponse;
     }
 }
 

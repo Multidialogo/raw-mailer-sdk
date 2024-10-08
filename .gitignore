@@ -6,3 +6,6 @@ phpunit.xml
 
 # Composer
 composer.lock
+
+# Phpunit
+.phpunit.result.cache

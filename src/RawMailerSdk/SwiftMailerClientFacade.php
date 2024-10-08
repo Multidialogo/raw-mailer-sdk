@@ -1,6 +1,6 @@
 <?php
 
-namespace multidialogo\RawMailer;
+namespace multidialogo\RawMailerSdk;
 
 use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
 use Symfony\Component\Mailer\Transport;
@@ -20,10 +20,10 @@ class SwiftMailerClientFacade implements MailerInterface
         $this->mailer = new Mailer($this->transport);
     }
 
-    public function sendRawEmail(string $headers, string $body): SmtpServerResponse
+    public function sendRawEmail(string $headers, string $body): string
     {
         $result = $this->mailer->send(new RawMessage($headers . "\r\n" . $body));
 
-        return new SmtpServerResponse($this->transport->getLastResponse());
+        return $this->transport->getLastResponse();
     }
 }
