@@ -1,6 +1,9 @@
 .dockerignore
-Dockerfile
+docker-compose.yml
+.devcontainer
+docker/
 README.md
-devcontainer.json
 *.log
 .phpunit.result.cache
+.env
+.env.dist

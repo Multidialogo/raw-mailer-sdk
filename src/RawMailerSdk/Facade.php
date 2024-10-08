@@ -39,8 +39,7 @@ class Facade
 
     /**
      * @param string $driver
-     * @param array|null $awsConfig
-     * @param array|null $simpleSmtpConfig
+     * @param array|null $config
      * @param string $senderEmail
      * @param string $resultBaseDir
      * @param string|null $replyToEmail
@@ -50,8 +49,7 @@ class Facade
      */
     public function __construct(
         string  $driver,
-        ?array  $awsConfig,
-        ?array  $simpleSmtpConfig,
+        ?array  $config,
         string  $senderEmail,
         string  $resultBaseDir,
         ?string $replyToEmail = null,
@@ -83,19 +81,20 @@ class Facade
                 break;
 
             case static::DRIVERS['SES']:
-                if (!$awsConfig) {
+                if (!$config) {
                     throw new RuntimeException('Missing AWS configuration');
                 }
 
                 $this->smtpClient = new SesClientFacade(
                     new SesClient(
                         [
-                            'version' => $awsConfig['version'],
-                            'region' => $awsConfig['region'],
+                            'version' => $config['version'],
+                            'region' => $config['region'],
                             'credentials' => [
-                                'key' => $awsConfig['accessKey'],
-                                'secret' => $awsConfig['secretKey'],
+                                'key' => $config['accessKey'],
+                                'secret' => $config['secretKey'],
                             ],
+                            'endpoint' => "{$config['host']}:{$config['port']}",
                         ]
                     )
                 );
@@ -103,15 +102,15 @@ class Facade
                 break;
 
             case static::DRIVERS['STD']:
-                if (!$simpleSmtpConfig) {
+                if (!$config) {
                     throw new RuntimeException('Missing SIMPLE SMTP configuration');
                 }
 
                 $this->smtpClient = new SwiftMailerClientFacade(
-                    $simpleSmtpConfig['username'],
-                    $simpleSmtpConfig['password'],
-                    $simpleSmtpConfig['host'],
-                    $simpleSmtpConfig['port']
+                    $config['username'],
+                    $config['password'],
+                    $config['host'],
+                    $config['port']
                 );
 
                 break;

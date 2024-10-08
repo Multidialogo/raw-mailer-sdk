@@ -1,9 +1,70 @@
 services:
   app:
+    container_name: raw_mailer_sdk_app
     build:
-      context: docker
+      context: docker/app
       dockerfile: Dockerfile
     volumes:
       - .:/workspace
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}  # Dummy Secret Key
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}  # Set the default region
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - LOCALSTACK_HOST=${LOCALSTACK_HOST}
+      - LOCALSTACK_PORT=${LOCALSTACK_PORT}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+    networks:
+      - localstack_network  # Connect app to the same network as LocalStack
+    depends_on:
+      - localstack
+      - aws_cli
+
+  aws_cli:
+    container_name: raw_mailer_sdk_aws_cli
+    build:
+      context: docker/aws-cli
+      dockerfile: Dockerfile
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}  # Dummy Access Key
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}  # Dummy Secret Key
+      - AWS_DEFAULT_REGION=${AWS_REGION}  # Set the default region
+      - LOCALSTACK_HOST=${LOCALSTACK_HOST}
+      - LOCALSTACK_PORT=${LOCALSTACK_PORT}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+    networks:
+      - localstack_network
+    entrypoint: ["/entrypoint/add-ses-identities.sh"]
+    tty: true  # Enable pseudo-TTY for interactive shell
+    depends_on:
+      localstack:
+        condition: service_healthy  # Wait for LocalStack to be healthy
+
+
+  localstack:
+    container_name: raw_mailer_sdk_localstack
+    hostname: ${LOCALSTACK_HOST}
+    image: localstack/localstack
+    environment:
+      - SERVICES=ses # Include SES and other services you may need (csv), important must be lowercase
+      - LOCALSTACK_HOST=${LOCALSTACK_HOST}  # Set the LocalStack host
+    ports:
+      - "4566:${LOCALSTACK_PORT}"  # Main LocalStack API port
+      - "4510-4559:4510-4559"  # Port range for services (like SES)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow LocalStack
+      - ./docker/.data/localstack:/var/lib/localstack # Persist LocalStack data
+    networks:
+      localstack_network:
+        aliases:
+          - ${LOCALSTACK_HOST}  # Add an alias to access LocalStack by this name
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://${LOCALSTACK_HOST}:${LOCALSTACK_PORT}/_localstack/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  localstack_network:
+    driver: bridge  # Use the default bridge network
+

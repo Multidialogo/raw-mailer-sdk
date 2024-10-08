@@ -12,3 +12,7 @@ composer.lock
 
 # src
 /results
+
+# docker
+docker/.data/
+.env

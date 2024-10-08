@@ -123,6 +123,15 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## Development Environment
 This repository includes a devcontainer configuration to streamline the development environment setup. You can use either PhpStorm or Visual Studio Code (VSCode) to take advantage of the development container.
 
+### Easy jump start with docker compose
+
+From the root directory:
+```bash
+docker compose run app ./vendor/bin/phpunit
+```
+
+This will run the unit tests suite.
+
 ### Using the DevContainer with VSCode
 Install Docker: Ensure that Docker is installed on your machine. Download Docker
 

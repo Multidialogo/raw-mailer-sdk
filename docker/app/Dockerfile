@@ -5,6 +5,7 @@ FROM php:8.2-cli
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
@@ -24,9 +25,6 @@ RUN docker-php-ext-install pdo pdo_mysql pcntl
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
-RUN composer install --no-interaction --optimize-autoloader
-
-# Expose the port for the PHP server
-EXPOSE 8000
+CMD composer install --no-interaction --optimize-autoloader

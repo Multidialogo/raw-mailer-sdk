@@ -1,0 +1,19 @@
+[
+  {
+    "attempt": 0,
+    "code": 250,
+    "completedAt": "{{date}}",
+    "message": "2.0.0 Ok: queued as {{aws-message-id}}",
+    "messageUuid": "4f41efd7-38ce-4d30-8a32-155a6ec8001b",
+    "rawResponse": "250 2.0.0 Ok: queued as {{aws-message-id}}"
+  },
+  {
+    "attempt": 0,
+    "code": 250,
+    "completedAt": "{{date}}",
+    "message": "2.0.0 Ok: queued as {{aws-message-id}}",
+    "messageUuid": "70058d57-e4cd-491e-9300-f8b89c3cd05f",
+    "rawResponse": "250 2.0.0 Ok: queued as {{aws-message-id}}"
+  }
+
+]
