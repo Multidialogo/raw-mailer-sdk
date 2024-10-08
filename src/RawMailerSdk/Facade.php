@@ -178,7 +178,7 @@ class Facade
 
                         file_put_contents("{$resultDirectory}/{$message->getUuid()}.{$attempts}", $result->getRawResponse());
 
-                        if ($maxAttempts) {
+                        if ($attempts) {
                             sleep(2 * $attempts);
                         }
                     } while ($result->isBusy() && $attempts++ <= $maxAttempts);
