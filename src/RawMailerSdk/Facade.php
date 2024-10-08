@@ -198,7 +198,7 @@ class Facade
         $results = [];
         $resultFiles = glob("{$resultDirectory}/*");
         foreach ($resultFiles as $resultFile) {
-            $results[] = SmtpServerResponse::fromResponse(file_get_contents($resultFile));
+            $results[] = SmtpServerResponse::fromResponseFile($resultFile);
         }
 
         return $results;

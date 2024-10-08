@@ -14,6 +14,11 @@ class SmtpServerResponse implements JsonSerializable
 
     private string $rawResponse;
 
+    private ?string $messageUuid;
+
+    private ?int $attempt;
+
+
     private function __construct(int $code, string $message, string $rawResponse)
     {
         $this->code = $code;
@@ -29,6 +34,18 @@ class SmtpServerResponse implements JsonSerializable
         }
 
         throw new InvalidArgumentException("Invalid SMTP response format: '{$rawResponse}'");
+    }
+
+    public static function fromResponseFile(string $responseFilePath): self
+    {
+        $instance =  static::fromResponse(file_get_contents($responseFilePath));
+
+        $pathInfo = pathinfo($responseFilePath);
+
+        $instance->messageUuid = $pathInfo['filename'];
+        $instance->attempt = (int) $pathInfo['extension'];
+
+        return $instance;
     }
 
     /**
@@ -82,11 +99,17 @@ class SmtpServerResponse implements JsonSerializable
     }
 
     public function jsonSerialize() {
-        return [
+        $serialization = [
             'code' => $this->getCode(),
             'message' => $this->getMessage(),
             'rawResponse' => $this->getRawResponse()
         ];
+
+        if ($this->messageUuid) {
+            $serialization = array_merge(['messageUuid' => $this->messageUuid, 'attempt' => $this->attempt], $serialization);
+        }
+
+        return $serialization;
     }
 }
 
