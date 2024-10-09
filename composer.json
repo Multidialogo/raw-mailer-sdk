@@ -1,6 +1,7 @@
 {
   "name": "multidialogo/raw-mailer-sdk",
   "description": "A flexible library for sending emails using various drivers (AWS SES, SMTP, and a fake client for testing).",
+  "license": "MIT",
   "type": "library",
   "require": {
     "php": "^8.0",
