@@ -39,8 +39,8 @@ class SwiftMailerClientFacade implements MailerInterface
             ->from($message->getSenderEmailAddress())
             ->to($message->getRecipientEmailAddress())
             ->subject($message->getSubject())
-            ->text($message->getPlainTextBody())
-            ->html($message->getHtmlTextBody());
+            ->text($message->getPlainTextBody(), $message->getCharset())
+            ->html($message->getHtmlTextBody(), $message->getCharset());
 
         if ($message->getReplyToEmailAddress()) {
             $email->replyTo($message->getReplyToEmailAddress());
