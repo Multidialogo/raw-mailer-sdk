@@ -28,46 +28,32 @@ Ensure you have the required dependencies installed, including the AWS SDK for P
 To get started, include the necessary namespaces and create an instance of the `Facade` class:
 
 ```php
-use multidialogo\RawMailer\Facade;
+use multidialogo\RawMailerSdk\Facade;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
 
 $facade = new Facade(
-    'SES', // or 'STD' for standard SMTP, 'FAKE' for testing
+    Facade::DRIVERS['SES'], // or 'STD' for standard SMTP, 'FAKE' for testing
     [
         'version' => 'latest',
         'region' => 'your-region',
         'accessKey' => 'your-access-key',
         'secretKey' => 'your-secret-key',
     ],
-    null, // For simple SMTP config, provide an associative array
-    'sender@example.com',
-    'replyto@example.com',
-    'development', // or 'production'
+    '/path/to/results', // Directory for result files
+    'catchall.example.com', // Optional catchall domain
+    'custom_boundary_', // Custom boundary prefix
+    5 // Max parallel jobs
 );
-```
 
-### Sending Emails
+// Creating a message
+$message = new SmtpMessage('sender@example.com', 'recipient@example.com', 'Subject', 'Plain text body', '<p>HTML body</p>');
+// Add attachments if needed
+$message->addAttachment('/path/to/attachment.pdf');
 
-You can send multiple emails in parallel:
 
-```php
-$messages = [/* Array of Message objects */];
+// Sending multiple emails in parallel
+$messages = [$message, /* other SmtpMessage instances */];
 $results = $facade->parallelSend($messages, 3); // 3 attempts for each message
-```
-
-### Sending a Single Email
-
-To send a single email, use the `send` method directly:
-
-```php
-$result = $facade->send(
-    'sender@example.com',
-    'recipient@example.com',
-    'Subject',
-    [],
-    'Plain text body',
-    '<p>HTML body</p>',
-    ['/path/to/attachment.pdf']
-);
 ```
 
 ## Configuration
@@ -83,24 +69,7 @@ The SDK supports three drivers:
 ### Attachment Size Limits
 
 - AWS SES: Maximum attachment size is **6.5 MB**.
-- Standard SMTP: Maximum attachment size is **15 MB**.
-
-### Parallel Job Configuration
-
-You can set the number of parallel jobs (default is **10**):
-
-```php
-$facade = new Facade(
-    'SES',
-    null,
-    null,
-    'sender@example.com',
-    null,
-    'production',
-    'boundary_',
-    5 // Set max parallel jobs
-);
-```
+- Standard SMTP: Maximum attachment size is **25 MB**.
 
 ## Features
 
