@@ -5,7 +5,6 @@ namespace multidialogo\RawMailerSdk\Model;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use InvalidArgumentException;
 use JsonSerializable;
 
 class SmtpServerResponse implements JsonSerializable
@@ -90,7 +89,7 @@ class SmtpServerResponse implements JsonSerializable
      */
     public function isError(): bool
     {
-        return ($this->code >= 400 && $this->code < 600);
+        return ($this->code >= 400 && $this->code < 600) || $this->code === 666;
     }
 
     public function isBusy(): bool
@@ -111,7 +110,14 @@ class SmtpServerResponse implements JsonSerializable
         ];
 
         if ($this->messageUuid) {
-            $serialization = array_merge(['messageUuid' => $this->messageUuid, 'attempt' => $this->attempt, 'completedAt' => $this->completedAt->format('Y-m-d H:i:s')], $serialization);
+            $serialization = array_merge(
+                [
+                    'messageUuid' => $this->messageUuid,
+                    'attempt' => $this->attempt,
+                    'completedAt' => $this->completedAt->format('Y-m-d H:i:s'),
+                ],
+                $serialization
+            );
         }
 
         return $serialization;
