@@ -41,7 +41,6 @@ $facade = new Facade(
     ],
     '/path/to/results', // Directory for result files
     'catchall.example.com', // Optional catchall domain
-    'custom_boundary_', // Custom boundary prefix
     5 // Max parallel jobs
 );
 
