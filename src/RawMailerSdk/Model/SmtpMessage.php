@@ -224,9 +224,15 @@ class SmtpMessage
         return $headers;
     }
 
-    public function getSize(): int
+    public function getAttachmentsSize(): int
     {
-        return strlen("{$this->getRawHeaders()}{$this->getRawBody()}");
+        $fileSizes = [];
+
+        foreach ($this->attachmentPaths as $attachmentPath) {
+            $fileSizes[$attachmentPath] = filesize($attachmentPath);
+        }
+
+        return array_sum($fileSizes);
     }
 
     private function addHeader(SmtpHeader $header): self

@@ -17,9 +17,9 @@ class Facade
         'STD' => 'STD',
     ];
 
-    public const MAX_ATTACHMENT_SIZE_AWS_SES = 6815744; #6.5MB
+    public const MAX_ATTACHMENT_SIZE_AWS_SES = 6815744; #~6.5MB
 
-    public const MAX_ATTACHMENT_SIZE_SMTP = 22020096; #15MB
+    public const MAX_ATTACHMENT_SIZE_SMTP = 26214400 ; #~25MB
 
     public const MAX_PARALLEL_JOBS = 10;
 
@@ -183,9 +183,11 @@ class Facade
         SmtpMessage $message
     ): string
     {
-        if ($this->smtpClient instanceof SesClientFacade && $message->getSize() > static::MAX_ATTACHMENT_SIZE_AWS_SES) {
+        $messageSize = $message->getAttachmentsSize();
+
+        if ($this->smtpClient instanceof SesClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_AWS_SES) {
             throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_AWS_SES . ' bytes, please use the simple mailer driver instead');
-        } else if ($this->smtpClient instanceof SwiftMailerClientFacade && $message->getSize() > static::MAX_ATTACHMENT_SIZE_SMTP) {
+        } else if ($this->smtpClient instanceof SwiftMailerClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_SMTP) {
             throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_SMTP . ' bytes');
         }
 

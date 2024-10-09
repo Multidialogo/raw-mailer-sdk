@@ -102,7 +102,8 @@ class SmtpServerResponse implements JsonSerializable
         return $this->rawResponse;
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize(): mixed
+    {
         $serialization = [
             'code' => $this->getCode(),
             'message' => $this->getMessage(),
