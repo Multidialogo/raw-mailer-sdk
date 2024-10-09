@@ -19,7 +19,7 @@ class Facade
 
     public const MAX_ATTACHMENT_SIZE_AWS_SES = 6815744; #~6.5MB
 
-    public const MAX_ATTACHMENT_SIZE_SMTP = 26214400 ; #~25MB
+    public const MAX_ATTACHMENT_SIZE_SMTP = 26214400; #~25MB
 
     public const MAX_PARALLEL_JOBS = 10;
 
@@ -27,7 +27,7 @@ class Facade
 
     private string $resultBaseDir;
 
-    private ?string $catchallDomain;
+    private ?string $recipientsCatchallDomain;
 
     private int $parallelJobs;
 
@@ -35,23 +35,27 @@ class Facade
      * @param string $driver
      * @param array|null $config
      * @param string $resultBaseDir
-     * @param string|null $catchallDomain
+     * @param string|null $recipientsCatchallDomain
      * @param int $parallelJobs
      */
     public function __construct(
         string  $driver,
         ?array  $config,
         string  $resultBaseDir,
-        ?string $catchallDomain = null,
+        ?string $recipientsCatchallDomain = null,
         int     $parallelJobs = 10
     )
     {
         if (!is_writable($resultBaseDir)) {
-           throw new InvalidArgumentException("{$resultBaseDir} is not writable");
+            throw new InvalidArgumentException("{$resultBaseDir} is not writable");
         }
 
         if ($parallelJobs > static::MAX_PARALLEL_JOBS) {
             throw new InvalidArgumentException('Parallelism cannot exceed: ' . static::MAX_PARALLEL_JOBS . ' jobs');
+        }
+
+        if (null !== $recipientsCatchallDomain && !preg_match('/^(?=.{1,253})(?:(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,}$/', $recipientsCatchallDomain)) {
+            throw new InvalidArgumentException("{$recipientsCatchallDomain} is not a valid domain");
         }
 
         switch ($driver) {
@@ -101,7 +105,7 @@ class Facade
 
         $this->resultBaseDir = $resultBaseDir;
 
-        $this->catchallDomain = $catchallDomain;
+        $this->recipientsCatchallDomain = $recipientsCatchallDomain;
         $this->parallelJobs = $parallelJobs;
     }
 
@@ -184,6 +188,10 @@ class Facade
             throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_AWS_SES . ' bytes, please use the simple mailer driver instead');
         } else if ($this->smtpClient instanceof SwiftMailerClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_SMTP) {
             throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_SMTP . ' bytes');
+        }
+
+        if ($this->recipientsCatchallDomain) {
+            $message = $message->withOverriddenRecipientDomain($this->recipientsCatchallDomain);
         }
 
         return $this->smtpClient->send($message);

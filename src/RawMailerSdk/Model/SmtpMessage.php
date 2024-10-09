@@ -252,6 +252,13 @@ class SmtpMessage
         return array_sum($fileSizes);
     }
 
+    public function withOverriddenRecipientDomain(string $domain): self
+    {
+        $this->recipientEmailAddress = str_replace('@', '_AT_', $this->recipientEmailAddress) . "@{$domain}";
+
+        return $this;
+    }
+
     private function addHeader(SmtpHeader $header): self
     {
         if (isset($this->headers[$header->getName()])) {
