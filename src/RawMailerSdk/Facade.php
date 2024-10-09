@@ -5,7 +5,7 @@ namespace multidialogo\RawMailerSdk;
 use Aws\Ses\SesClient;
 use InvalidArgumentException;
 use multidialogo\RawMailerSdk\Test\FakeMailClient;
-use multidialogo\RawMailerSdk\Model\BaseMessage;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
 use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
 use RuntimeException;
 
@@ -91,10 +91,10 @@ class Facade
                 }
 
                 $this->smtpClient = new SwiftMailerClientFacade(
-                    $config['username'],
-                    $config['password'],
                     $config['host'],
-                    $config['port']
+                    $config['port'],
+                    $config['username'] ?? null,
+                    $config['password'] ?? null
                 );
 
                 break;
@@ -111,7 +111,7 @@ class Facade
     }
 
     /**
-     * @param BaseMessage[] $messages
+     * @param SmtpMessage[] $messages
      * @param int $maxAttempts
      * @return SmtpServerResponse[], results
      */
@@ -129,8 +129,8 @@ class Facade
         $pids = [];
         foreach ($batches as $batch) {
             foreach ($batch as $message) {
-                if (!$message instanceof BaseMessage) {
-                    throw new InvalidArgumentException('All messages must be a ' . BaseMessage::class . ' instance');
+                if (!$message instanceof SmtpMessage) {
+                    throw new InvalidArgumentException('All messages must be a ' . SmtpMessage::class . ' instance');
                 }
 
                 $pid = pcntl_fork();
@@ -180,11 +180,11 @@ class Facade
     }
 
     /**
-     * @param BaseMessage $message
+     * @param SmtpMessage $message
      * @return string
      */
     private function send(
-        BaseMessage $message
+        SmtpMessage $message
     ): string
     {
         if ($this->smtpClient instanceof SesClientFacade && $message->getSize() > static::MAX_ATTACHMENT_SIZE_AWS_SES) {
@@ -193,9 +193,6 @@ class Facade
             throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_SMTP . ' bytes');
         }
 
-        $headers = $message->getRawHeaders();
-        $body = $message->getRawBody();
-
-        return $this->smtpClient->sendRawEmail($headers, $body);
+        return $this->smtpClient->send($message);
     }
 }

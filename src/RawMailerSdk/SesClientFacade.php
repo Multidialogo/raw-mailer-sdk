@@ -4,7 +4,7 @@ namespace multidialogo\RawMailerSdk;
 
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
-use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
 
 class SesClientFacade implements MailerInterface
 {
@@ -16,12 +16,12 @@ class SesClientFacade implements MailerInterface
         $this->sesClient = $sesClient;
     }
 
-    public function sendRawEmail(string $headers, string $body): string
+    public function send(SmtpMessage $message): string
     {
         try {
             $result = $this->sesClient->sendRawEmail([
                 'RawMessage' => [
-                    'Data' => $headers . $body,
+                    'Data' => $message->getRawHeaders() . $message->getRawBody(),
                 ],
             ]);
 

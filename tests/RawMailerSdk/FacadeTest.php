@@ -3,8 +3,9 @@
 namespace Tests\RawMailerSdk;
 
 use multidialogo\RawMailerSdk\Facade;
-use multidialogo\RawMailerSdk\Model\BaseMessage;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
 use multidialogo\RawMailerSdk\Model\SmtpHeader;
+use multidialogo\RawMailerSdk\Test\FakeMailClient;
 use PHPUnit\Framework\TestCase;
 
 class FacadeTest extends TestCase
@@ -37,19 +38,19 @@ class FacadeTest extends TestCase
                 Facade::DRIVERS['FAKE'],
                 null,
                 [
-                    new BaseMessage(
+                    new SmtpMessage(
                         '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
                         getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient.multidialogo.it',
                         'Test subject',
-                        [new SmtpHeader('X-test-fail-internal', 'fail'),],
+                        [new SmtpHeader(FakeMailClient::TEST_HEADERS['FAIL'], 'fail'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new BaseMessage(
+                    new SmtpMessage(
                         '70058d57-e4cd-491e-9300-f8b89c3cd05f',
                         getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient2.multidialogo.it',
@@ -61,12 +62,48 @@ class FacadeTest extends TestCase
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new BaseMessage(
+                    new SmtpMessage(
                         '8a26886e-37ce-4569-9541-bbeb67a57c66',
                         getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient3.multidialogo.it',
                         'Test subject',
-                        [new SmtpHeader('X-test-fail-busy', 'busy'),],
+                        [new SmtpHeader(FakeMailClient::TEST_HEADERS['BUSY'], 'busy'),],
+                        'Plain text content',
+                        '<html lang="en"><body>Html content</body></html>',
+                        [
+                            __DIR__ . '/fixtures/testParallelSend/01.pdf',
+                        ]
+                    ),
+                ],
+            ],
+            [
+                'std.client',
+                Facade::DRIVERS['STD'],
+                [
+                    'host' => getenv('SMTP_HOST'),
+                    'port' => (int)getenv('SMTP_PORT'),
+                    'username' => getenv('SMTP_USERNAME'),
+                    'password' => getenv('SMTP_PASSWORD'),
+                ],
+                [
+                    new SmtpMessage(
+                        '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+                        getenv('MAIL_FROM_ADDRESS'),
+                        'test@recipient.multidialogo.it',
+                        'Test subject',
+                        [new SmtpHeader('X-foobar', 'fo bar baz'),],
+                        'Plain text content',
+                        '<html lang="en"><body>Html content</body></html>',
+                        [
+                            __DIR__ . '/fixtures/testParallelSend/01.pdf',
+                        ]
+                    ),
+                    new SmtpMessage(
+                        '70058d57-e4cd-491e-9300-f8b89c3cd05f',
+                        getenv('MAIL_FROM_ADDRESS'),
+                        'test@recipient2.multidialogo.it',
+                        'Test subject',
+                        [new SmtpHeader('X-foobar', 'fo bar baz'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
@@ -84,10 +121,10 @@ class FacadeTest extends TestCase
                     'accessKey' => getenv('AWS_ACCESS_KEY_ID'),
                     'secretKey' => getenv('AWS_SECRET_ACCESS_KEY'),
                     'host' => 'http://' . getenv('LOCALSTACK_HOST'),
-                    'port' => (int) getenv('LOCALSTACK_PORT'),
+                    'port' => (int)getenv('LOCALSTACK_PORT'),
                 ],
                 [
-                    new BaseMessage(
+                    new SmtpMessage(
                         '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
                         getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient.multidialogo.it',
@@ -99,7 +136,7 @@ class FacadeTest extends TestCase
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new BaseMessage(
+                    new SmtpMessage(
                         '70058d57-e4cd-491e-9300-f8b89c3cd05f',
                         getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient2.multidialogo.it',

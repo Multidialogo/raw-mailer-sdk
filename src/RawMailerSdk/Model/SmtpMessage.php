@@ -4,18 +4,29 @@ namespace multidialogo\RawMailerSdk\Model;
 
 use InvalidArgumentException;
 
-class BaseMessage
+class SmtpMessage
 {
     private string $uuid;
+
+    private string $senderEmailAddress;
+
+    private string $recipientEmailAddress;
+
+    private string $subject;
+
+    /**
+     * @var SmtpHeader[]
+     */
+    private array $additionalHeaders;
 
     /**
      * @var SmtpHeader[]
      */
     private array $headers;
 
-    private string $plainText;
+    private string $plainTextBody;
 
-    private string $htmlText;
+    private string $htmlTextBody;
 
     private array $attachmentPaths;
 
@@ -27,8 +38,8 @@ class BaseMessage
      * @param string $recipientEmailAddress
      * @param string $subject
      * @param array $additionalHeaders
-     * @param string $plainText
-     * @param string $htmlText
+     * @param string $plainTextBody
+     * @param string $htmlTextBody
      * @param array $attachmentPaths
      * @param string|null $replyToEmailAddress
      * @param string|null $boundary
@@ -40,8 +51,8 @@ class BaseMessage
         string  $recipientEmailAddress,
         string  $subject,
         array   $additionalHeaders,
-        string  $plainText,
-        string  $htmlText,
+        string  $plainTextBody,
+        string  $htmlTextBody,
         array   $attachmentPaths = [],
         ?string $replyToEmailAddress = null,
         ?string $boundary = null,
@@ -71,8 +82,11 @@ class BaseMessage
         }
 
         $this->uuid = $uuid;
-        $this->plainText = $plainText;
-        $this->htmlText = $htmlText;
+        $this->senderEmailAddress = $senderEmailAddress;
+        $this->recipientEmailAddress = $recipientEmailAddress;
+        $this->subject = $subject;
+        $this->plainTextBody = $plainTextBody;
+        $this->htmlTextBody = $htmlTextBody;
         $this->attachmentPaths = $attachmentPaths;
         if (null === $boundary) {
             $this->boundary = md5(uniqid(rand(), true));
@@ -93,6 +107,7 @@ class BaseMessage
             ->addHeader(new SmtpHeader('Subject', $subject))
             ->addHeader(new SmtpHeader('MIME-Version', $mimeVersion));
 
+        $this->additionalHeaders = $additionalHeaders;
         foreach ($additionalHeaders as $additionalHeader) {
             if (!$additionalHeader instanceof SmtpHeader) {
                 throw new InvalidArgumentException("Expected instance of " . SmtpHeader::class . " .  but received " . gettype($additionalHeader));
@@ -110,6 +125,47 @@ class BaseMessage
         return $this->uuid;
     }
 
+    public function getSenderEmailAddress(): string
+    {
+        return $this->senderEmailAddress;
+    }
+
+    public function getRecipientEmailAddress(): string
+    {
+        return $this->recipientEmailAddress;
+    }
+
+    public function getSubject(): string
+    {
+        return $this->subject;
+    }
+
+    public function getPlainTextBody(): string
+    {
+        return $this->plainTextBody;
+    }
+
+    public function getHtmlTextBody(): string
+    {
+        return $this->htmlTextBody;
+    }
+
+    public function getAttachmentPaths(): array
+    {
+        return $this->attachmentPaths;
+    }
+
+    public function getAdditionalHeaders(): array
+    {
+        return $this->additionalHeaders;
+    }
+
+    public function hasHeader(string $name): bool
+    {
+        return isset($this->headers[$name]);
+    }
+
+
     public function getRawBody(): string
     {
         $body = "--{$this->boundary}\r\n";
@@ -119,12 +175,12 @@ class BaseMessage
         $body .= "--{$this->boundary}\r\n";
         $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
         $body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
-        $body .= $this->plainText . "\r\n\r\n";
+        $body .= $this->plainTextBody . "\r\n\r\n";
 
         $body .= "--{$this->boundary}\r\n";
         $body .= "Content-Type: text/html; charset=UTF-8\r\n";
         $body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
-        $body .= $this->htmlText . "\r\n\r\n";
+        $body .= $this->htmlTextBody . "\r\n\r\n";
 
         $fileAttachmentNames = [];
         foreach ($this->attachmentPaths as $attachmentPath) {

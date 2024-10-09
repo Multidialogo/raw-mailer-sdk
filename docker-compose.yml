@@ -13,11 +13,16 @@ services:
       - AWS_DEFAULT_REGION=${AWS_REGION}
       - LOCALSTACK_HOST=${LOCALSTACK_HOST}
       - LOCALSTACK_PORT=${LOCALSTACK_PORT}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
     networks:
-      - localstack_network  # Connect app to the same network as LocalStack
+      - raw_mailer_sdk_network  # Connect app to the same network as LocalStack
     depends_on:
       - localstack
+      - mailcatcher
       - aws_cli
 
   aws_cli:
@@ -33,7 +38,7 @@ services:
       - LOCALSTACK_PORT=${LOCALSTACK_PORT}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
     networks:
-      - localstack_network
+      - raw_mailer_sdk_network
     entrypoint: ["/entrypoint/add-ses-identities.sh"]
     tty: true  # Enable pseudo-TTY for interactive shell
     depends_on:
@@ -51,11 +56,12 @@ services:
     ports:
       - "4566:${LOCALSTACK_PORT}"  # Main LocalStack API port
       - "4510-4559:4510-4559"  # Port range for services (like SES)
+    restart: on-failure
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Allow LocalStack
       - ./docker/.data/localstack:/var/lib/localstack # Persist LocalStack data
     networks:
-      localstack_network:
+      raw_mailer_sdk_network:
         aliases:
           - ${LOCALSTACK_HOST}  # Add an alias to access LocalStack by this name
     healthcheck:
@@ -64,7 +70,19 @@ services:
       timeout: 5s
       retries: 5
 
+  mailcatcher:
+    container_name: raw_mailer_sdk_mailcatcher
+    image: dockage/mailcatcher
+    ports:
+      - "127.0.0.1:${MAILCATCHER_HTTP_PORT}:${MAILCATCHER_HTTP_PORT}"
+      - "127.0.0.1:${SMTP_PORT}:${SMTP_PORT}" # FIXME: needed to expose outside?
+    restart: on-failure
+    networks:
+      raw_mailer_sdk_network:
+        aliases:
+          - ${SMTP_HOST}  # Add an alias to access MailCatcher by this name
+
 networks:
-  localstack_network:
+  raw_mailer_sdk_network:
     driver: bridge  # Use the default bridge network
 

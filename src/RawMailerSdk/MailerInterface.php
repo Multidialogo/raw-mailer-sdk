@@ -2,9 +2,9 @@
 
 namespace multidialogo\RawMailerSdk;
 
-use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
 
 interface MailerInterface
 {
-    public function sendRawEmail(string $headers, string $body): string;
+    public function send(SmtpMessage $message): string;
 }

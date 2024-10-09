@@ -2,28 +2,62 @@
 
 namespace multidialogo\RawMailerSdk;
 
-use multidialogo\RawMailerSdk\Model\SmtpServerResponse;
-use Symfony\Component\Mailer\Transport;
+use multidialogo\RawMailerSdk\Model\SmtpMessage;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
+use Throwable;
+
 
 class SwiftMailerClientFacade implements MailerInterface
 {
     private Mailer $mailer;
 
-    private Transport $transport;
+    private TransportInterface $transport;
 
-    public function __construct(string $username, string $password, string $host, int $port)
+    public function __construct(string $host, int $port, ?string $username = null, ?string $password = null)
     {
-        $this->transport = Trransport::fromDsn("smtp://{$username}:{$password}@{$host}:{$port}");
+        $identity = '';
+        if ($username) {
+            $identity = $username;
+            if ($password) {
+                $identity = "{$identity}:{$password}";
+            }
+            $identity .= '@';
+        }
+
+        $this->transport = Transport::fromDsn("smtp://{$identity}{$host}:{$port}");
 
         $this->mailer = new Mailer($this->transport);
     }
 
-    public function sendRawEmail(string $headers, string $body): string
+    public function send(SmtpMessage $message): string
     {
-        $result = $this->mailer->send(new RawMessage($headers . "\r\n" . $body));
+        $email = (new Email())
+            ->from($message->getSenderEmailAddress())
+            ->to($message->getRecipientEmailAddress())
+            ->subject($message->getSubject())
+            ->text($message->getPlainTextBody())
+            ->html($message->getHtmlTextBody());
 
-        return $this->transport->getLastResponse();
+        foreach ($message->getAdditionalHeaders() as $additionalHeader) {
+            $email->getHeaders()->addTextHeader($additionalHeader->getName(), $additionalHeader->getValue());
+        }
+
+        foreach ($message->getAttachmentPaths() as $filePath) {
+            $email->attachFromPath($filePath);
+        }
+
+        try {
+            $this->mailer->send($email);
+        } catch (TransportExceptionInterface $te) {
+            return "500 5.0.0 Internal server error: {$te->getMessage()}";
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
+
+        return '250 2.0.0 Ok: sent';
     }
 }
