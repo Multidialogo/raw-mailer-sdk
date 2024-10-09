@@ -3,7 +3,8 @@
 namespace Tests\RawMailerSdk;
 
 use multidialogo\RawMailerSdk\Facade;
-use multidialogo\RawMailerSdk\Model\Message;
+use multidialogo\RawMailerSdk\Model\BaseMessage;
+use multidialogo\RawMailerSdk\Model\SmtpHeader;
 use PHPUnit\Framework\TestCase;
 
 class FacadeTest extends TestCase
@@ -16,7 +17,6 @@ class FacadeTest extends TestCase
         $responses = (new Facade(
             $driver,
             $config,
-            getenv('MAIL_FROM_ADDRESS'),
             __DIR__ . '/../../'
         ))->parallelSend($messages);
 
@@ -37,33 +37,36 @@ class FacadeTest extends TestCase
                 Facade::DRIVERS['FAKE'],
                 null,
                 [
-                    new Message(
+                    new BaseMessage(
                         '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+                        getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient.multidialogo.it',
                         'Test subject',
-                        ['X-test-fail-internal: fail',],
+                        [new SmtpHeader('X-test-fail-internal', 'fail'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new Message(
+                    new BaseMessage(
                         '70058d57-e4cd-491e-9300-f8b89c3cd05f',
+                        getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient2.multidialogo.it',
                         'Test subject',
-                        ['X-foobar: fo bar baz',],
+                        [new SmtpHeader('X-foobar', 'fo bar baz'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new Message(
+                    new BaseMessage(
                         '8a26886e-37ce-4569-9541-bbeb67a57c66',
+                        getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient3.multidialogo.it',
                         'Test subject',
-                        ['X-test-fail-busy: busy',],
+                        [new SmtpHeader('X-test-fail-busy', 'busy'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
@@ -84,22 +87,24 @@ class FacadeTest extends TestCase
                     'port' => (int) getenv('LOCALSTACK_PORT'),
                 ],
                 [
-                    new Message(
+                    new BaseMessage(
                         '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+                        getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient.multidialogo.it',
                         'Test subject',
-                        ['X-foobar: fo bar baz',],
+                        [new SmtpHeader('X-foobar', 'fo bar baz'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
                             __DIR__ . '/fixtures/testParallelSend/01.pdf',
                         ]
                     ),
-                    new Message(
+                    new BaseMessage(
                         '70058d57-e4cd-491e-9300-f8b89c3cd05f',
+                        getenv('MAIL_FROM_ADDRESS'),
                         'test@recipient2.multidialogo.it',
                         'Test subject',
-                        ['X-foobar: fo bar baz',],
+                        [new SmtpHeader('X-foobar', 'fo bar baz'),],
                         'Plain text content',
                         '<html lang="en"><body>Html content</body></html>',
                         [
