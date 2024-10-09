@@ -127,10 +127,10 @@ This repository includes a devcontainer configuration to streamline the developm
 
 From the root directory:
 ```bash
-docker compose run app ./vendor/bin/phpunit
+docker compose run --rm app ./vendor/bin/phpunit
 ```
 
-This will run the unit tests suite.
+This will run the unit test suite.
 
 ### Check mailcatcher web ui to debug messages sent with STD driver
 ```text
