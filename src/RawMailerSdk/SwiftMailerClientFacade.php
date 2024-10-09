@@ -55,6 +55,7 @@ class SwiftMailerClientFacade implements MailerInterface
         } catch (TransportExceptionInterface $te) {
             return "500 5.0.0 Internal server error: {$te->getMessage()}";
         } catch (Throwable $t) {
+            // TODO transform response in "original http headers"
             return $t->getMessage();
         }
 

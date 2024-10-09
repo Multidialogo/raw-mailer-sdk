@@ -145,11 +145,7 @@ class Facade
                     // Child process
                     $attempts = 0;
                     do {
-                        $result = SmtpServerResponse::fromResponse(
-                            $this->send(
-                                $message
-                            )
-                        );
+                        $result = SmtpServerResponse::fromResponse($this->send($message));
 
                         file_put_contents("{$resultDirectory}/{$message->getUuid()}.{$attempts}", $result->getRawResponse());
 

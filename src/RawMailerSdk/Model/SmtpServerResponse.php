@@ -37,7 +37,7 @@ class SmtpServerResponse implements JsonSerializable
             return new self((int)$matches[1], trim($matches[2]), $rawResponse);
         }
 
-        throw new InvalidArgumentException("Invalid SMTP response format: '{$rawResponse}'");
+        return new self(666, "Brutal SMTP response format!", $rawResponse);
     }
 
     public static function fromResponseFile(string $responseFilePath): self
