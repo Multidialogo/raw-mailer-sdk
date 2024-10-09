@@ -93,7 +93,16 @@ This repository includes a devcontainer configuration to streamline the developm
 
 ### Easy jump start with docker compose
 
-From the root directory:
+#### Install php dependencies
+(From the root directory)
+
+```bash
+docker compose run --rm app composer install --optimize-autoloader
+```
+
+#### Launch test suite
+(From the root directory)
+
 ```bash
 docker compose run --rm app ./vendor/bin/phpunit
 ```

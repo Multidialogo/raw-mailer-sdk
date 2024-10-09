@@ -18,6 +18,8 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+    command: >
+      bash -c "composer install --optimize-autoloader && php-fpm"
     networks:
       - raw_mailer_sdk_network  # Connect app to the same network as LocalStack
     depends_on:
