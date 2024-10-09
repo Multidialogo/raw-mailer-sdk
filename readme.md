@@ -132,6 +132,11 @@ docker compose run app ./vendor/bin/phpunit
 
 This will run the unit tests suite.
 
+### Check mailcatcher web ui to debug messages sent with STD driver
+```text
+http://localhost:1080/
+```
+
 ### Using the DevContainer with VSCode
 Install Docker: Ensure that Docker is installed on your machine. Download Docker
 
