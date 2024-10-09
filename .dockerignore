@@ -1,6 +1,7 @@
 .dockerignore
 docker-compose.yml
 .devcontainer
+.github
 docker/
 README.md
 *.log
