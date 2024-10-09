@@ -29,8 +29,6 @@ class Facade
 
     private ?string $catchallDomain;
 
-    private string $customBoundaryPrefix;
-
     private int $parallelJobs;
 
     /**
@@ -38,7 +36,6 @@ class Facade
      * @param array|null $config
      * @param string $resultBaseDir
      * @param string|null $catchallDomain
-     * @param string $customBoundaryPrefix
      * @param int $parallelJobs
      */
     public function __construct(
@@ -46,7 +43,6 @@ class Facade
         ?array  $config,
         string  $resultBaseDir,
         ?string $catchallDomain = null,
-        string  $customBoundaryPrefix = 'boundary_',
         int     $parallelJobs = 10
     )
     {
@@ -106,7 +102,6 @@ class Facade
         $this->resultBaseDir = $resultBaseDir;
 
         $this->catchallDomain = $catchallDomain;
-        $this->customBoundaryPrefix = $customBoundaryPrefix;
         $this->parallelJobs = $parallelJobs;
     }
 
