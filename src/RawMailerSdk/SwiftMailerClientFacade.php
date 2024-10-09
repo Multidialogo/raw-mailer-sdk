@@ -42,6 +42,10 @@ class SwiftMailerClientFacade implements MailerInterface
             ->text($message->getPlainTextBody())
             ->html($message->getHtmlTextBody());
 
+        if ($message->getReplyToEmailAddress()) {
+            $email->replyTo($message->getReplyToEmailAddress());
+        }
+
         foreach ($message->getAdditionalHeaders() as $additionalHeader) {
             $email->getHeaders()->addTextHeader($additionalHeader->getName(), $additionalHeader->getValue());
         }

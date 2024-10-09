@@ -10,6 +10,8 @@ class SmtpMessage
 
     private string $senderEmailAddress;
 
+    private ?string $replyToEmailAddress;
+
     private string $recipientEmailAddress;
 
     private string $subject;
@@ -32,6 +34,8 @@ class SmtpMessage
 
     private string $boundary;
 
+    private string $charset;
+
     /**
      * @param string $uuid
      * @param string $senderEmailAddress
@@ -44,6 +48,7 @@ class SmtpMessage
      * @param string|null $replyToEmailAddress
      * @param string|null $boundary
      * @param string $mimeVersion
+     * @param string $charset
      */
     public function __construct(
         string  $uuid,
@@ -56,7 +61,8 @@ class SmtpMessage
         array   $attachmentPaths = [],
         ?string $replyToEmailAddress = null,
         ?string $boundary = null,
-        string  $mimeVersion = '1.0'
+        string  $mimeVersion = '1.0',
+        string $charset = 'UTF-8'
     )
     {
         if (!filter_var($senderEmailAddress, FILTER_VALIDATE_EMAIL)) {
@@ -83,6 +89,7 @@ class SmtpMessage
 
         $this->uuid = $uuid;
         $this->senderEmailAddress = $senderEmailAddress;
+        $this->replyToEmailAddress = $replyToEmailAddress;
         $this->recipientEmailAddress = $recipientEmailAddress;
         $this->subject = $subject;
         $this->plainTextBody = $plainTextBody;
@@ -93,6 +100,7 @@ class SmtpMessage
         } else {
             $this->boundary = $boundary;
         }
+        $this->charset = $charset;
 
         // Create the email headers
         $this
@@ -130,6 +138,11 @@ class SmtpMessage
         return $this->senderEmailAddress;
     }
 
+    public function getReplyToEmailAddress(): ?string
+    {
+        return $this->replyToEmailAddress;
+    }
+
     public function getRecipientEmailAddress(): string
     {
         return $this->recipientEmailAddress;
@@ -165,20 +178,24 @@ class SmtpMessage
         return isset($this->headers[$name]);
     }
 
+    public function getCharset(): string
+    {
+        return $this->charset;
+    }
 
     public function getRawBody(): string
     {
         $body = "--{$this->boundary}\r\n";
-        $body .= "Content-Type: multipart/alternative; charset=UTF-8\r\n";
+        $body .= "Content-Type: multipart/alternative; charset={$this->charset}\r\n";
         $body .= "MIME-Version: 1.0\r\n\r\n";
 
         $body .= "--{$this->boundary}\r\n";
-        $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $body .= "Content-Type: text/plain; charset={$this->charset}\r\n";
         $body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
         $body .= $this->plainTextBody . "\r\n\r\n";
 
         $body .= "--{$this->boundary}\r\n";
-        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $body .= "Content-Type: text/html; charset={$this->charset}\r\n";
         $body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
         $body .= $this->htmlTextBody . "\r\n\r\n";
 
