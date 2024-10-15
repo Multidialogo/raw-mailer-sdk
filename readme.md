@@ -46,9 +46,20 @@ $facade = new Facade(
 );
 
 // Creating a message
-$message = new SmtpMessage('sender@example.com', 'recipient@example.com', 'Subject', 'Plain text body', '<p>HTML body</p>');
-// Add attachments if needed
-$message->addAttachment('/path/to/attachment.pdf');
+$message = new SmtpMessage(
+    '4f41efd7-38ce-4d30-8a32-155a6ec8001b',
+    'test@sender.multidialogo.it'),
+    'test@recipient.multidialogo.it',
+    'Test subject',
+    [new SmtpHeader('X-some-header', 'header value here'),],
+    'Plain text content',
+    '<html lang="en"><body>Html content</body></html>',
+    [
+        'some/accessible/path/01.pdf',
+        'some/accessible/path/test.pdf',
+        'some/accessible/path/some file.pdf',
+    ]
+);
 
 
 // Sending multiple emails in parallel
