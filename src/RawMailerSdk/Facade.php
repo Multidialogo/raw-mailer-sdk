@@ -196,4 +196,23 @@ class Facade
 
         return $this->smtpClient->send($message);
     }
+
+    /**
+     * @param MailerInterface $client
+     * @param SmtpMessage $message
+     *
+     * @return void
+     *
+     * @throws MessageSizeException, if the message is not compatible with the given client
+     */
+    public static function assertMessageDriverCompatible(MailerInterface $client, SmtpMessage $message): void
+    {
+        $messageSize = $message->getAttachmentsSize();
+
+        if ($client instanceof SesClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_AWS_SES) {
+            throw new MessageSizeException($messageSize, static::MAX_ATTACHMENT_SIZE_AWS_SES, static::DRIVERS['SES'], static::DRIVERS['STD']);
+        } else if ($client instanceof SwiftMailerClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_SMTP) {
+            throw new MessageSizeException($messageSize, static::MAX_ATTACHMENT_SIZE_SMTP, static::DRIVERS['SES'], null);
+        }
+    }
 }
