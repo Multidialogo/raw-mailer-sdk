@@ -185,9 +185,9 @@ class Facade
         $messageSize = $message->getAttachmentsSize();
 
         if ($this->smtpClient instanceof SesClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_AWS_SES) {
-            throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_AWS_SES . ' bytes, please use the simple mailer driver instead');
+            throw new MessageSizeException($messageSize, static::MAX_ATTACHMENT_SIZE_AWS_SES, static::DRIVERS['SES'], static::DRIVERS['STD']);
         } else if ($this->smtpClient instanceof SwiftMailerClientFacade && $messageSize > static::MAX_ATTACHMENT_SIZE_SMTP) {
-            throw new InvalidArgumentException('Attachment size cannot exceed ' . static::MAX_ATTACHMENT_SIZE_SMTP . ' bytes');
+            throw new MessageSizeException($messageSize, static::MAX_ATTACHMENT_SIZE_SMTP, static::DRIVERS['SES'], null);
         }
 
         if ($this->recipientsCatchallDomain) {
