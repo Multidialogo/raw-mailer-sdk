@@ -1,6 +1,7 @@
 # Multidialogo Raw Mailer SDK
 
-Welcome to the **Multidialogo Raw Mailer SDK**! This library provides a flexible and robust way to send emails using various drivers, including AWS SES, standard SMTP, and a fake mail client for testing purposes.
+Welcome to the **Multidialogo Raw Mailer SDK**! 
+This library provides a flexible and robust way to send emails using various drivers, including AWS SES, standard SMTP, and a fake mail client for testing purposes.
 
 ## Table of Contents
 
